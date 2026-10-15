@@ -198,3 +198,16 @@ footer {
   padding: 20px;
   color: #666;
 }
+
+.search-bar {
+  margin: 10px 0 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
