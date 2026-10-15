@@ -3,18 +3,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const activitySearch = document.getElementById("activity-search");
+
+  let allActivities = {};
 
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
       const response = await fetch("/activities");
       const activities = await response.json();
+      allActivities = activities;
 
+      renderActivities(activities);
+    } catch (error) {
+      activitiesList.innerHTML =
+        "<p>Failed to load activities. Please try again later.</p>";
+      console.error("Error fetching activities:", error);
+    }
+  }
+
+  // Function to render a given set of activities (used for search/filter)
+  function renderActivities(activities) {
+    try {
       // Clear loading message
       activitiesList.innerHTML = "";
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
+
+      const entries = Object.entries(activities);
+
+      if (entries.length === 0) {
+        activitiesList.innerHTML = "<p>No activities match your search.</p>";
+        return;
+      }
 
       // Populate activities list
-      Object.entries(activities).forEach(([name, details]) => {
+      entries.forEach(([name, details]) => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
@@ -153,6 +176,26 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.classList.remove("hidden");
       console.error("Error signing up:", error);
     }
+  });
+
+  // Filter activities by name or description as the user types
+  activitySearch.addEventListener("input", () => {
+    const query = activitySearch.value.trim().toLowerCase();
+
+    if (!query) {
+      renderActivities(allActivities);
+      return;
+    }
+
+    const filtered = Object.fromEntries(
+      Object.entries(allActivities).filter(
+        ([name, details]) =>
+          name.toLowerCase().includes(query) ||
+          details.description.toLowerCase().includes(query)
+      )
+    );
+
+    renderActivities(filtered);
   });
 
   // Initialize app
